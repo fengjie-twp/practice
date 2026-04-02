@@ -61,85 +61,33 @@ public class Game2048 {
         board[r][c] = value;
 
     }
-
-
-
-    //操作方式（用WASD控制）
-    public void move(){
-
-
-    }
-    public boolean moveLeft(){
-        boolean isMove = false;
-        for(int i = 0; i < N; i++){
-            int[] line = new int[N];
-            int k = 0;
-            int j;
-            //复制一个，便于判断是否发生有效移动or合并
-            int[] old = new int[N];
-            for (j = 0; j < N; j++) {
-                old[j] = board[i][j];
-            }
-            //压缩
-            for (j = 0; j < N; j++){
-                if (board[i][j] != 0) {
-                    line[k] = board[i][j];
-                    k++;
-                }
-            }
-            //原数据清空
-            for (j = 0; j < N; j++){
-                board[i][j] = 0;
-            }
-            //合并
-            for(j = 0; j < N - 1; j++){
-                if (line[j] != 0 && line[j] ==line[j+1]){
-                    line[j] = 2 * line[j];
-                    score += line[j];
-                    line[j+1] = 0;
-                    j++;
-                }
-            }
-            //压缩写回
-            for(k = 0,j = 0; k < N ; k++){
-                if(line[k] != 0){
-                    board[i][j] = line[k];
-                    j++;
-                }
-            }
-            for (j = 0; j < N; j++) {
-                if (old[j] != board[i][j]) {
-                    isMove = true;
-                    break;
-                }
-            }
+    
+    //统一调用，读取指令，并做相应变化
+    public boolean move(char direction) {
+        boolean moved = false;
+        switch (Character.toLowerCase(direction)) {
+            case 'a': // left
+                moved = moveLeft();
+                break;
+            case 'd': // right
+                moved = moveRight();
+                break;
+            case 'w': // up
+                moved = moveUp();
+                break;
+            case 's': // down
+                moved = moveDown();
+                break;
+            default:
+                return false;
         }
 
-        return isMove;
-    }
-    private void reverseRow(int r) {
-        for (int j = 0; j < N / 2; j++) {
-            int tmp = board[r][j];
-            board[r][j] = board[r][N - 1 - j];
-            board[r][N - 1 - j] = tmp;
+        if (moved) {
+            spawn();
         }
-    }
-    public boolean moveRight() {
-        //反转方向，直接使用moveLeft
-        for (int i = 0; i < N; i++)
-        {
-            reverseRow(i);
-        }
-        boolean isMove = moveLeft();
 
-        //恢复方向
-        for (int i = 0; i < N; i++) {
-            reverseRow(i);
-        }
-        return isMove;
+        return moved;
     }
-
-    //合并规则
 
     //游戏结束判定
     public boolean isGameOver(){
@@ -178,5 +126,114 @@ public class Game2048 {
     public static void main(String[] args){
 
 
+    }
+
+
+    //预处理 & 调用方法
+    //取行处理变化
+    private int[] mergeLineLeft(int[] raw) {
+        int[] line = new int[N];
+        int k = 0;
+        // 压缩
+        for (int j = 0; j < N; j++) {
+            if (raw[j] != 0)
+                line[k++] = raw[j];
+        }
+        // 合并
+        for (int j = 0; j < N - 1; j++) {
+            if (line[j] != 0 && line[j] == line[j + 1]) {
+                line[j] *= 2;
+                score += line[j];
+                line[j + 1] = 0;
+                j++;
+            }
+        }
+        // 再压缩成最终结果（把合并后的 0 挤走）
+        int[] res = new int[N];
+        int out = 0;
+        for (int j = 0; j < N; j++) {
+            if (line[j] != 0) res[out++] = line[j];
+        }
+
+        return res;
+    }
+    //反转
+    private int[] reverse(int[] a) {
+        int[] r = new int[N];
+        for (int i = 0; i < N; i++) {
+            r[i] = a[N - 1 - i];
+        }
+        return r;
+    }
+    //上下左右合并，并计分
+    public boolean moveLeft() {
+        boolean moved = false;
+
+        for (int i = 0; i < N; i++) {
+            int[] old = new int[N];
+            for (int j = 0; j < N; j++) old[j] = board[i][j];
+
+            int[] merged = mergeLineLeft(old);
+
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] != merged[j]) moved = true;
+                board[i][j] = merged[j];
+            }
+        }
+
+        return moved;
+    }
+    public boolean moveRight() {
+        boolean moved = false;
+
+        for (int i = 0; i < N; i++) {
+            int[] old = new int[N];
+            for (int j = 0; j < N; j++) old[j] = board[i][j];
+
+            // 右移：反转后做“左合并”，再反转回来
+            int[] merged = reverse(mergeLineLeft(reverse(old)));
+
+            for (int j = 0; j < N; j++) {
+                if (board[i][j] != merged[j]) moved = true;
+                board[i][j] = merged[j];
+            }
+        }
+
+        return moved;
+    }
+    public boolean moveUp() {
+        boolean moved = false;
+
+        for (int c = 0; c < N; c++) {
+            int[] old = new int[N];
+            for (int r = 0; r < N; r++) old[r] = board[r][c];
+
+            int[] merged = mergeLineLeft(old);
+
+            for (int r = 0; r < N; r++) {
+                if (board[r][c] != merged[r]) moved = true;
+                board[r][c] = merged[r];
+            }
+        }
+
+        return moved;
+    }
+    public boolean moveDown() {
+        boolean moved = false;
+
+        for (int c = 0; c < N; c++) {
+            int[] old = new int[N];
+            for (int r = 0; r < N; r++) old[r] = board[r][c];
+
+            // 下移：反转后做“左合并”，再反转回来
+            int[] merged = reverse(mergeLineLeft(reverse(old)));
+
+            for (int r = 0; r < N; r++) {
+                if (board[r][c] != merged[r]) moved = true;
+                board[r][c] = merged[r];
+            }
+        }
+
+        return moved;
     }
 }
