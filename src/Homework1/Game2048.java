@@ -11,19 +11,92 @@ public class Game2048 {
     private int score = 0;
     private boolean winAnnouncement = false;
 
-    //打印棋盘
+    public static void main(String[] args) {
+        Game2048 game = new Game2048();
+        game.start();
+        Scanner in = new Scanner(System.in);
+        while (true) {
+            game.printBoard();
+            if (game.isGameOver()) {
+                System.out.println("Game Over! Final Score: " + game.getScore());
+                break;
+            }
+
+            System.out.print("Move (W/A/S/D), Q to quit, R to restart: ");
+            String s = in.nextLine().trim();
+            if (s.isEmpty())
+                continue;
+            char cmd = Character.toLowerCase(s.charAt(0));
+            if (cmd == 'q') {
+                System.out.println("Quit. Final Score: " + game.getScore());
+                break;
+            }
+            if (cmd == 'r') {
+                game.start();
+                continue;
+            }
+            //避免玩家输入其他字母，影响游玩
+            if (cmd != 'w' && cmd != 'a' && cmd != 's' && cmd != 'd') {
+                System.out.println("无效命令，请输入 W/A/S/D, R 或 Q。");
+                continue;
+            }
+            boolean moved = game.move(cmd);
+            if (moved) {
+                // 如果这一步刚刚触发胜利提示，就询问是否继续
+                if (game.isWinned()) {
+                    System.out.print("是否继续游戏？(y/n): ");
+                    String ans = in.nextLine().trim().toLowerCase();
+                    if (ans.isEmpty() || ans.charAt(0) != 'y') {
+                        System.out.println("最终得分: " + game.getScore());
+                        break;
+                    }
+                }
+
+            }else {
+                System.out.println("无效移动（棋盘未变化），请换个方向。");
+            }
+        }
+        in.close();
+    }
+
+    //打印棋盘（借助AI实现方格棋盘，为不同数字赋上不同颜色）
     public void printBoard() {
         System.out.println("Score: " + score);
+
+        final int cellW = 4; // 每格宽度（可调：8/10/12）
+        String top    = "┌" + ("─".repeat(cellW) + "┬").repeat(N - 1) + "─".repeat(cellW) + "┐";
+        String mid    = "├" + ("─".repeat(cellW) + "┼").repeat(N - 1) + "─".repeat(cellW) + "┤";
+        String bottom = "└" + ("─".repeat(cellW) + "┴").repeat(N - 1) + "─".repeat(cellW) + "┘";
+
+        System.out.println(top);
+
         for (int i = 0; i < N; i++) {
+            System.out.print("│");
+
             for (int j = 0; j < N; j++) {
-                if (board[i][j] == 0) {
-                    System.out.printf("%5s", ".");
+                int v = board[i][j];
+
+                if (v == 0) {
+                    // 空格：直接输出空白
+                    System.out.print(" ".repeat(cellW));
                 } else {
-                    System.out.printf("%5d", board[i][j]);
+                    // 数字：居中 + 颜色
+                    String s = String.valueOf(v);
+                    int left = (cellW - s.length()) / 2;
+                    int right = cellW - s.length() - left;
+
+                    String colored = colorForValue(v) + s + ANSI_RESET;
+                    System.out.print(" ".repeat(left) + colored + " ".repeat(right));
                 }
+
+                System.out.print("│");
             }
+
             System.out.println();
+            if (i != N - 1) System.out.println(mid);
         }
+
+        System.out.println(bottom);
     }
 
     //获取分数
@@ -158,53 +231,7 @@ public class Game2048 {
 
 
 
-    public static void main(String[] args) {
-        Game2048 game = new Game2048();
-        game.start();
-        Scanner in = new Scanner(System.in);
-        while (true) {
-            game.printBoard();
-            if (game.isGameOver()) {
-                System.out.println("Game Over! Final Score: " + game.getScore());
-                break;
-            }
 
-            System.out.print("Move (W/A/S/D), Q to quit, R to restart: ");
-            String s = in.nextLine().trim();
-            if (s.isEmpty())
-                continue;
-            char cmd = Character.toLowerCase(s.charAt(0));
-            if (cmd == 'q') {
-                System.out.println("Quit. Final Score: " + game.getScore());
-                break;
-            }
-            if (cmd == 'r') {
-                game.start();
-                continue;
-            }
-                //避免玩家输入其他字母，影响游玩
-            if (cmd != 'w' && cmd != 'a' && cmd != 's' && cmd != 'd') {
-                System.out.println("无效命令，请输入 W/A/S/D, R 或 Q。");
-                continue;
-            }
-            boolean moved = game.move(cmd);
-            if (moved) {
-                // 如果这一步刚刚触发胜利提示，就询问是否继续
-                if (game.isWinned()) {
-                    System.out.print("是否继续游戏？(y/n): ");
-                    String ans = in.nextLine().trim().toLowerCase();
-                    if (ans.isEmpty() || ans.charAt(0) != 'y') {
-                        System.out.println("最终得分: " + game.getScore());
-                        break;
-                    }
-                }
-
-            }else {
-                System.out.println("无效移动（棋盘未变化），请换个方向。");
-            }
-        }
-        in.close();
-    }
 
     //预处理 & 调用方法
     //取行处理变化
@@ -313,4 +340,38 @@ public class Game2048 {
         }
         return moved;
     }
+
+    private String colorForValue(int v) {
+        return switch (v) {
+            case 2    -> ANSI_BRIGHT_GREEN;
+            case 4    -> ANSI_GREEN;
+            case 8    -> ANSI_BRIGHT_CYAN;
+            case 16   -> ANSI_CYAN;
+            case 32   -> ANSI_BRIGHT_BLUE;
+            case 64   -> ANSI_BLUE;
+            case 128  -> ANSI_BRIGHT_YELLOW;
+            case 256  -> ANSI_YELLOW;
+            case 512  -> ANSI_BRIGHT_PURPLE;
+            case 1024 -> ANSI_PURPLE;
+            case 2048 -> ANSI_BRIGHT_RED;
+            default   -> ANSI_RED; // 4096+ 或其它
+        };
+    }
+
+    // ===== ANSI 颜色常量（终端支持才会显示颜色）=====
+    private static final String ANSI_RESET  = "\u001B[0m";
+
+    private static final String ANSI_RED    = "\u001B[31m";
+    private static final String ANSI_GREEN  = "\u001B[32m";
+    private static final String ANSI_YELLOW = "\u001B[33m";
+    private static final String ANSI_BLUE   = "\u001B[34m";
+    private static final String ANSI_PURPLE = "\u001B[35m";
+    private static final String ANSI_CYAN   = "\u001B[36m";
+
+    private static final String ANSI_BRIGHT_RED    = "\u001B[91m";
+    private static final String ANSI_BRIGHT_GREEN  = "\u001B[92m";
+    private static final String ANSI_BRIGHT_YELLOW = "\u001B[93m";
+    private static final String ANSI_BRIGHT_BLUE   = "\u001B[94m";
+    private static final String ANSI_BRIGHT_PURPLE = "\u001B[95m";
+    private static final String ANSI_BRIGHT_CYAN   = "\u001B[96m";
 }
