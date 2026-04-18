@@ -63,28 +63,28 @@ public class Complex {
     }
 
     public Complex add(Complex right){
-        Complex c;
+        Complex c = new Complex();
         c.real = this.real + right.real;
         c.imag = this.imag + right.imag;
         return c;
     }
 
     public Complex subtract(Complex right){
-        Complex c;
+        Complex c = new Complex();
         c.real = this.real - right.real;
         c.imag = this.imag - right.imag;
         return c;
     }
 
     public Complex multiply(Complex right){
-        Complex c;
+        Complex c = new Complex();
         c.real = this.real * right.real - this.imag * right.imag;
         c.imag = this.real * right.imag + this.imag * right.real;
         return c;
     }
 
     public Complex divide(Complex right){
-        Complex c;
+        Complex c = new Complex();
         double mo = this.abs();
         c.real = (this.real * right.real + this.imag * right.imag) / Math.pow(mo, 2);
         c.imag = (this.real * right.imag - this.imag * right.real) / Math.pow(mo, 2);
