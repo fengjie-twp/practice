@@ -1,4 +1,4 @@
-package Homework2.Complex;
+package Homework2;
 
 public class Complex {
     private double real;
@@ -35,7 +35,7 @@ public class Complex {
     }
 
     public String toString(){
-        return "("+ real + " + " + imag + "i)";
+        return " ("+ real + " + " + imag + "i) ";
     }
 
     public boolean isReal(){
