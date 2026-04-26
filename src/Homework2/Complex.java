@@ -34,6 +34,11 @@ public class Complex {
         this.imag = imag;
     }
 
+    public  void setValue(Complex right){
+        this.real = right.real;
+        this.imag = right.imag;
+    }
+
     public String toString(){
         return " ("+ real + " + " + imag + "i) ";
     }
