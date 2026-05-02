@@ -11,9 +11,7 @@ public class Card {
         this.suit = suit;
         this.point = point;
     }
-    public int getValue(){
-        return this.value;
-    }
+    public int getValue() { return value; }
 
     @Override
     public String toString() {

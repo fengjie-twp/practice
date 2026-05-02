@@ -10,7 +10,7 @@ public class Deck {
 
     public Deck() {
         // 4种花色
-        String[] suits = {"\u2663", "\u2666", "\u2665", "\u2660"};
+        String[] suits = {"♣", "♦", "♥", "♠"};
         // 13种牌面
         String[] points = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "A"};
         // 对应的大小
@@ -18,7 +18,8 @@ public class Deck {
         int index = 0;
         for (String suit : suits) {
             for (int i = 0; i < points.length; i++) {
-                cards[index++] = new Card(values[i], suit, points[i]);
+                cards[index] = new Card(values[i], suit, points[i]);
+                index++;
             }
         }
     }
