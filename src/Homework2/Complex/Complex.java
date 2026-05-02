@@ -1,4 +1,4 @@
-package Homework2;
+package Homework2.Complex;
 
 public class Complex {
     private double real;

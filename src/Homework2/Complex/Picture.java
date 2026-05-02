@@ -1,4 +1,4 @@
-package Homework2;
+package Homework2.Complex;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;

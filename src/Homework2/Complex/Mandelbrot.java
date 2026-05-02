@@ -1,4 +1,4 @@
-package Homework2;
+package Homework2.Complex;
 
 import java.awt.Color;
 import java.io.File;

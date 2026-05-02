@@ -1,4 +1,4 @@
-package Homework2;
+package Homework2.Complex;
 
 public class TestComplex {
     public static void main(String[] args){

@@ -1,4 +1,5 @@
-package Homework2;
+package Homework2.Complex;
+
 import java.util.Scanner;
 
 public class ComplexApp {
