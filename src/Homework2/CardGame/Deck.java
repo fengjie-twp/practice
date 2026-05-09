@@ -10,6 +10,7 @@ public class Deck {
 
     public Deck() {
         // 4种花色
+        //尝试了为不同花色赋上不同颜色，不太成功，遂使用简单版本
         String[] suits = {"♣", "♦", "♥", "♠"};
         // 13种牌面
         String[] points = {"2", "3", "4", "5", "6", "7", "8", "9", "10", "Jack", "Queen", "King", "A"};
